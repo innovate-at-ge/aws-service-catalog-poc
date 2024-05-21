@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Allows a Role/user to call the lambda to generate a URL for SageMaker Notebook"
+Parameters:
+  AdminRole:
+    Type: String
+    Description: Leave empty if you used the portfolio template, or provide the Admin Role ARN to assume role from.
+Conditions:
+  EmptyRole: !Equals
+    - !Ref AdminRole
+    - ""
+
+Resources:
+  DeveloperRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: "Developer"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "servicecatalog.amazonaws.com"
+            Action:
+              - sts:AssumeRole
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !If [EmptyRole, !ImportValue "AdminRole", !Ref "AdminRole"]
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+        - "arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+        - "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser"
+
+Outputs:
+  DeveloperRole:
+    Description: Developer Role
+    Value: !GetAtt "DeveloperRole.Arn"
+    Export:
+      Name: "Developer-ARN"

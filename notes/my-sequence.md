@@ -1,0 +1,2 @@
+- First imported roles.yaml file that creates Developer role, following the instructions provided here https://catalog.us-east-1.prod.workshops.aws/workshops/d40750d7-a330-49be-9945-cde864610de9/en-US/1core/roles
+- 
