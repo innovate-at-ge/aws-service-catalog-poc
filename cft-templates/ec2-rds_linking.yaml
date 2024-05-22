@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Linked Products for EC2/RDS"
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: RDS Instance Configuration
+        Parameters:
+          - ProductId2
+          - Product2Version
+      - Label:
+          default: EC2 Instance Configuration
+        Parameters:
+          - ProductId1
+          - Product1Version
+    ParameterLabels:
+      ProductId2:
+        default: RDS Product ID
+      Product2Version:
+        default: RDS Provisioned Artifact/Version ID
+      ProductId1:
+        default: EC2 Product ID
+      Product1Version:
+        default: EC2 Provisioned Artifact/Version ID
+Parameters:
+  ProductId1:
+    Description: EC2 product to be launched, like prod-XXXXXXX
+    Default: prod-jhhuq5msjzjfm
+    Type: String
+  Product1Version:
+    Description: EC2 product version to be launched, like pa-YYYYYYY
+    Default: pa-bxddepodr4fk6
+    Type: String
+  ProductId2:
+    Description: RDS product to be launched, like prod-WWWWWW
+    Default: prod-bdbwmes5rsumc
+    Type: String
+  Product2Version:
+    Description: RDS product version to be launched, like pa-ZZZZZZZ
+    Default: pa-6soz76gkat6y4
+    Type: String
+  VPCName:
+    Type: AWS::EC2::VPC::Id
+  PrivateSubnetID:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: "List Id of existing Private subnets"
+
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    AllowedValues:
+      - t2.micro
+      - t2.medium
+      - t3.micro
+      - t3.medium
+      - t3.large
+  LatestAmiId:
+    Type: "String"
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  DBName:
+    Type: String
+    Default: pgdb
+  DBUsername:
+    Type: String
+    Default: root
+    NoEcho: true
+  DBPassword:
+    Type: String
+    Default: root1234
+    NoEcho: true
+  DBClass:
+    Type: String
+    Default: db.m6g.large
+  DBAllocatedStorage:
+    Type: Number
+    Default: 5
+Resources:
+  ProductEC2:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductId: !Ref ProductId1
+      #ProductName: "Simple Linux EC2"
+      ProvisionedProductName: !Sub "EC2-Product-chaining-${AWS::StackName}"
+      #ProvisioningArtifactName: EC2_v1.0
+      ProvisioningArtifactId: !Ref Product1Version
+      ProvisioningParameters:
+        - Key: InstanceType
+          Value: !Ref InstanceType
+        - Key: LatestAmiId
+          Value: !Ref LatestAmiId
+
+  ProductRDS:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    DependsOn: ProductEC2
+    Properties:
+      ProductId: !Ref ProductId2
+      ProvisionedProductName: !Sub "Network-Product-chaining-${AWS::StackName}"
+      #ProvisioningArtifactName: "v1.0"
+      #ProductName: network
+      ProvisioningArtifactId: !Ref Product2Version
+      ProvisioningParameters:
+        - Key: VPC
+          Value: !Ref VPCName
+        - Key: PrivateSubnetID
+          Value: !Join [ ",", !Ref PrivateSubnetID ]
+        - Key: DBName
+          Value: !Ref DBName
+        - Key: DBUsername
+          Value: !Ref DBUsername
+        - Key: DBPassword
+          Value: !Ref DBPassword
+        - Key: DBClass
+          Value: !Ref DBClass
+        - Key: DBAllocatedStorage
+          Value: !Ref DBAllocatedStorage

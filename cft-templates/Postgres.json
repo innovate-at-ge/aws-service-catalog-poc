@@ -1,6 +1,31 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "DB,RDSPostgres,v1.0,PostgreSQL RDS Template. beta-fdp-1p7mq4sr4",
+  "Metadata":
+  {
+    "AWS::CloudFormation::Interface":
+    {
+      "ParameterGroups":
+      [
+        {
+          "Label":
+          {
+            "default": "Portfolio Information"
+          },
+          "Parameters":
+          [
+            "VPC",
+            "PrivateSubnetID",
+            "DBName",
+            "DBUsername",
+            "DBPassword",
+            "DBClass",
+            "DBAllocatedStorage"
+          ]
+        }
+      ]
+    }
+  },
   "Parameters": {
     "DBName": {
       "Default": "pgdb",
