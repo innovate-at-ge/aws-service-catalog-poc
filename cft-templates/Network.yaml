@@ -9,6 +9,8 @@ Metadata:
         - VPCCIDR
         - PrivateSubnet1ACIDR
         - PrivateSubnet1BCIDR
+        - PublicSubnet1ACIDR
+        - PublicSubnet1BCIDR
 Parameters:
   VPCName:
     Default: 'Network Lab VPC'

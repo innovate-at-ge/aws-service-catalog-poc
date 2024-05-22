@@ -25,26 +25,68 @@ Metadata:
 Parameters:
   ProductId1:
     Description: Network product to be launched, like prod-XXXXXXX
+    Default: prod-ztrf3ruyl3kro
     Type: String
   Product1Version:
     Description: Network product version to be launched, like pa-YYYYYYY
+    Default: pa-dopmtt74cewu4
     Type: String
   ProductId2:
     Description: EC2 product to be launched, like prod-WWWWWW
+    Default: prod-jhhuq5msjzjfm
     Type: String
   Product2Version:
     Description: EC2 product version to be launched, like pa-ZZZZZZZ
+    Default: pa-bxddepodr4fk6
     Type: String
   VPCCIDR:
     Type: String
-    Default: "172.29.10.0/24"
+    Default: '172.29.10.0/24'
   PrivateSubnet1ACIDR:
-    Default: 172.29.10.0/26
+    Default: '172.29.10.128/28'
     Description: CIDR block for private subnet 1A
     Type: String
+  PrivateSubnet1AName:
+    Default: 'Private subnet 1A'
+    Description: Name for private subnet 1A
+    Type: String
+  PrivateSubnet1BCIDR:
+    Default: '172.29.10.144/28'
+    Description: CIDR block for private subnet 1B
+    Type: String
+  PrivateSubnet1BName:
+    Default: 'Private subnet 1B'
+    Description: Name for private subnet 1B
+    Type: String
   PublicSubnet1ACIDR:
-    Default: "172.29.10.128/26"
-    Description: CIDR block for private subnet
+    Default: '172.29.10.0/28'
+    Description: CIDR block for public subnet 1A
+    Type: String
+  PublicSubnet1AName:
+    Default: 'Public subnet 1A'
+    Description: Name for public subnet 1A
+    Type: String
+  PublicSubnet1BCIDR:
+    Default: '172.29.10.16/28'
+    Description: CIDR block for public subnet 1B
+    Type: String
+  PublicSubnet1BName:
+    Default: 'Public subnet 1B'
+    Description: Name for public subnet 1B
+    Type: String
+  PublicRouteTableName:
+    Default: 'Public route table'
+    Description: Name for public route table
+    Type: String
+  PrivateRouteTableName:
+    Default: 'Private route table'
+    Description: Name for private route table
+    Type: String
+  AvailabilityZoneA:
+    Default: 'us-east-1a'
+    Type: String
+  AvailabilityZoneB:
+    Default: 'us-east-1b'
     Type: String
   InstanceType:
     Type: String
@@ -72,8 +114,13 @@ Resources:
           Value: !Ref VPCCIDR
         - Key: PrivateSubnet1ACIDR
           Value: !Ref PrivateSubnet1ACIDR
+        - Key: PrivateSubnet1BCIDR
+          Value: !Ref PrivateSubnet1BCIDR
         - Key: PublicSubnet1ACIDR
           Value: !Ref PublicSubnet1ACIDR
+        - Key: PublicSubnet1BCIDR
+          Value: !Ref PublicSubnet1BCIDR
+
 
   ProductEC2:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
