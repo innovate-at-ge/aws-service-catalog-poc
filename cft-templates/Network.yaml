@@ -10,19 +10,59 @@ Metadata:
         - PrivateSubnet1ACIDR
         - PrivateSubnet1BCIDR
 Parameters:
+  VPCName:
+    Default: 'Network Lab VPC'
+    Description: Name of the VPC
+    Type: String
   VPCCIDR:
     Type: String
     Default: '172.29.10.0/24'
   PrivateSubnet1ACIDR:
-    Default: 172.29.10.0/26
+    Default: '172.29.10.128/28'
     Description: CIDR block for private subnet 1A
     Type: String
-  PublicSubnet1ACIDR:
-    Default: '172.29.10.128/26'
-    Description: CIDR block for private subnet
+  PrivateSubnet1AName:
+    Default: 'Private subnet 1A'
+    Description: Name for private subnet 1A
     Type: String
-
-
+  PrivateSubnet1BCIDR:
+    Default: '172.29.10.144/28'
+    Description: CIDR block for private subnet 1B
+    Type: String
+  PrivateSubnet1BName:
+    Default: 'Private subnet 1B'
+    Description: Name for private subnet 1B
+    Type: String
+  PublicSubnet1ACIDR:
+    Default: '172.29.10.0/28'
+    Description: CIDR block for public subnet 1A
+    Type: String
+  PublicSubnet1AName:
+    Default: 'Public subnet 1A'
+    Description: Name for public subnet 1A
+    Type: String
+  PublicSubnet1BCIDR:
+    Default: '172.29.10.16/28'
+    Description: CIDR block for public subnet 1B
+    Type: String
+  PublicSubnet1BName:
+    Default: 'Public subnet 1B'
+    Description: Name for public subnet 1B
+    Type: String
+  PublicRouteTableName:
+    Default: 'Public route table'
+    Description: Name for public route table
+    Type: String
+  PrivateRouteTableName:
+    Default: 'Private route table'
+    Description: Name for private route table
+    Type: String
+  AvailabilityZoneA:
+    Default: 'us-east-1a'
+    Type: String
+  AvailabilityZoneB:
+    Default: 'us-east-1b'
+    Type: String
 
 Resources:
 
@@ -42,7 +82,7 @@ Resources:
       EnableDnsHostnames: 'true'
       Tags:
         - Key: Name
-          Value: 'Network Lab VPC'
+          Value: !Ref VPCName
 
   VPCDHCPOptionsAssociation:
     Type: AWS::EC2::VPCDHCPOptionsAssociation
@@ -55,9 +95,21 @@ Resources:
     Properties:
       VpcId: !Ref 'VPC'
       CidrBlock: !Ref 'PrivateSubnet1ACIDR'
+      AvailabilityZone: !Ref AvailabilityZoneA
       Tags:
         - Key: Name
-          Value: Private subnet 1A
+          Value: !Ref PrivateSubnet1AName
+        - Key: Network
+          Value: Private
+  PrivateSubnet1B:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref 'VPC'
+      CidrBlock: !Ref 'PrivateSubnet1BCIDR'
+      AvailabilityZone: !Ref AvailabilityZoneB
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateSubnet1BName
         - Key: Network
           Value: Private
 
@@ -68,7 +120,7 @@ Resources:
       VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
-          Value: Private subnets A
+          Value: !Ref PrivateRouteTableName
         - Key: Network
           Value: Private
 
@@ -78,11 +130,24 @@ Resources:
       VpcId: !Ref 'VPC'
       CidrBlock: !Ref 'PublicSubnet1ACIDR'
       MapPublicIpOnLaunch: true
+      AvailabilityZone: !Ref AvailabilityZoneA
       Tags:
         - Key: Name
-          Value: Public subnet 1A
+          Value: !Ref PublicSubnet1AName
         - Key: Network
-          Value: Public      
+          Value: Public
+  PublicSubnet1B:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref 'VPC'
+      CidrBlock: !Ref 'PublicSubnet1BCIDR'
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Ref AvailabilityZoneB
+      Tags:
+        - Key: Name
+          Value: !Ref PublicSubnet1BName
+        - Key: Network
+          Value: Public
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -103,7 +168,7 @@ Resources:
       VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
-          Value: Public subnets 1a
+          Value: !Ref PublicRouteTableName
         - Key: Network
           Value: Public
     
@@ -119,75 +184,86 @@ Resources:
     Properties:
       SubnetId: !Ref 'PublicSubnet1A'
       RouteTableId: !Ref 'PublicSubnetRouteTable'
+  PublicSubnet1BRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref 'PublicSubnet1B'
+      RouteTableId: !Ref 'PublicSubnetRouteTable'
 
   PrivateSubnet1ARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref 'PrivateSubnet1A'
       RouteTableId: !Ref 'PrivateSubnetRouteTable'
+  PrivateSubnet1BRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref 'PrivateSubnet1B'
+      RouteTableId: !Ref 'PrivateSubnetRouteTable'
 
 #########END POINTS
-  CfnEndpoint:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      VpcId: !Ref VPC
-      ServiceName: !Sub "com.amazonaws.${AWS::Region}.cloudformation"
-      VpcEndpointType: "Interface"
-      PrivateDnsEnabled: true
-      SubnetIds:
-        - !Ref PrivateSubnet1A
-      SecurityGroupIds:
-        - !Ref EndpointSG
-
-  S3VPCEndpoint:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      VpcId: !Ref VPC
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Action: '*'
-            Effect: Allow
-            Resource: '*'
-            Principal: '*'
-      RouteTableIds: 
-        - !Ref PrivateSubnetRouteTable
-        - !Ref PublicSubnetRouteTable
-      ServiceName: !Join ['', [com.amazonaws., !Ref 'AWS::Region', .s3]]
-      VpcId: !Ref 'VPC'
-
-  STSEndpoint:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      VpcId: !Ref VPC
-      ServiceName: !Sub "com.amazonaws.${AWS::Region}.sts"
-      VpcEndpointType: "Interface"
-      PrivateDnsEnabled: true
-      SubnetIds:
-        - !Ref PrivateSubnet1A
-      SecurityGroupIds:
-        - !Ref EndpointSG
-
-  EndpointSG:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: "Traffic into CloudFormation Endpoint"
-      SecurityGroupIngress:
-      -
-          IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: "172.29.10.0/24"
-      -
-          IpProtocol: udp
-          FromPort: 53
-          ToPort: 53
-          CidrIp: "172.29.10.0/24"
-      VpcId: !Ref VPC
-      Tags:
-        -
-          Key: Name
-          Value: EndpointSG
+#  CfnEndpoint:
+#    Type: AWS::EC2::VPCEndpoint
+#    Properties:
+#      VpcId: !Ref VPC
+#      ServiceName: !Sub "com.amazonaws.${AWS::Region}.cloudformation"
+#      VpcEndpointType: "Interface"
+#      PrivateDnsEnabled: true
+#      SubnetIds:
+#        - !Ref PrivateSubnet1A
+#        - !Ref PrivateSubnet1B
+#      SecurityGroupIds:
+#        - !Ref EndpointSG
+#
+#  S3VPCEndpoint:
+#    Type: AWS::EC2::VPCEndpoint
+#    Properties:
+#      VpcId: !Ref VPC
+#      PolicyDocument:
+#        Version: '2012-10-17'
+#        Statement:
+#          - Action: '*'
+#            Effect: Allow
+#            Resource: '*'
+#            Principal: '*'
+#      RouteTableIds:
+#        - !Ref PrivateSubnetRouteTable
+#        - !Ref PublicSubnetRouteTable
+#      ServiceName: !Join ['', [com.amazonaws., !Ref 'AWS::Region', .s3]]
+#      VpcId: !Ref 'VPC'
+#
+#  STSEndpoint:
+#    Type: AWS::EC2::VPCEndpoint
+#    Properties:
+#      VpcId: !Ref VPC
+#      ServiceName: !Sub "com.amazonaws.${AWS::Region}.sts"
+#      VpcEndpointType: "Interface"
+#      PrivateDnsEnabled: true
+#      SubnetIds:
+#        - !Ref PrivateSubnet1A
+#      SecurityGroupIds:
+#        - !Ref EndpointSG
+#
+#  EndpointSG:
+#    Type: AWS::EC2::SecurityGroup
+#    Properties:
+#      GroupDescription: "Traffic into CloudFormation Endpoint"
+#      SecurityGroupIngress:
+#      -
+#          IpProtocol: tcp
+#          FromPort: 443
+#          ToPort: 443
+#          CidrIp: "172.29.10.0/24"
+#      -
+#          IpProtocol: udp
+#          FromPort: 53
+#          ToPort: 53
+#          CidrIp: "172.29.10.0/24"
+#      VpcId: !Ref VPC
+#      Tags:
+#        -
+#          Key: Name
+#          Value: EndpointSG
 
 Outputs:
   VPCID:
@@ -205,6 +281,16 @@ Outputs:
     Value: !Ref 'PrivateSubnet1ACIDR'
     Export:
       Name: 'Network-PrivateSubnet1ACIDR'
+  PrivateSubnet1B:
+    Description: Private subnet 1B
+    Value: !Ref 'PrivateSubnet1B'
+    Export:
+      Name: 'Network-PrivateSubnet1B'
+  PrivateSubnet1BCIDR:
+    Description: Private subnet 1B CIDR
+    Value: !Ref 'PrivateSubnet1BCIDR'
+    Export:
+      Name: 'Network-PrivateSubnet1BCIDR'
   PrivateSubnetRouteTable:
     Description: Subnet Route Table
     Value: !Ref PrivateSubnetRouteTable
@@ -220,3 +306,13 @@ Outputs:
     Value: !Ref 'PrivateSubnet1ACIDR'
     Export:
       Name: 'Network-2-PublicSubnet1ACIDR'
+  PublicSubnet1B:
+    Description: Private subnet 1B
+    Value: !Ref 'PublicSubnet1B'
+    Export:
+      Name: 'Network-PublicSubnet1B'
+  PublicSubnet1BCIDR:
+    Description: Private subnet 1B CIDR
+    Value: !Ref 'PrivateSubnet1BCIDR'
+    Export:
+      Name: 'Network-2-PublicSubnet1BCIDR'
