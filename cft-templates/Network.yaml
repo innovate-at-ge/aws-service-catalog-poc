@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
 Description: Portfolio setup for Service Catalog with EC2 and VPC products. (fdp-1p4da46nc)
 Metadata:
   AWS::CloudFormation::Interface:
@@ -6,45 +6,27 @@ Metadata:
       - Label:
           default: Network parameters
         Parameters:
-          - VPCCIDR
-          - PrivateSubnet2ACIDR
-          - PrivateSubnet2BCIDR
-          - PublicSubnet2ACIDR
-          - PublicSubnet2BCIDR
-          - AvailabilityZone1
-          - AvailabilityZone2
-
+        - VPCCIDR
+        - PrivateSubnet1ACIDR
+        - PrivateSubnet1BCIDR
 Parameters:
   VPCCIDR:
     Type: String
-    Default: '192.29.10.0/24'
-  PrivateSubnet2ACIDR:
+    Default: '172.29.10.0/24'
+  PrivateSubnet1ACIDR:
+    Default: 172.29.10.0/26
+    Description: CIDR block for private subnet 1A
     Type: String
-    Default: '192.29.10.0/26'
-    Description: CIDR block for private subnet 2A
-  PrivateSubnet2BCIDR:
+  PublicSubnet1ACIDR:
+    Default: '172.29.10.128/26'
+    Description: CIDR block for private subnet
     Type: String
-    Default: '192.29.10.64/26'
-    Description: CIDR block for private subnet 2B
-  PublicSubnet2ACIDR:
-    Type: String
-    Default: '192.29.10.128/26'
-    Description: CIDR block for public subnet 2A
-  PublicSubnet2BCIDR:
-    Type: String
-    Default: '192.29.10.192/26'
-    Description: CIDR block for public subnet 2B
-  AvailabilityZone1:
-    Type: String
-    Description: The first Availability Zone to use for the subnets
-    Default: "us-east-1a"
-  AvailabilityZone2:
-    Type: String
-    Description: The second Availability Zone to use for the subnets
-    Default: "us-east-1b"
+
+
 
 Resources:
-  #blumbing first
+
+#blumbing first
   DHCPOptions:
     Type: AWS::EC2::DHCPOptions
     Properties:
@@ -55,9 +37,9 @@ Resources:
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: !Ref VPCCIDR
-      EnableDnsSupport: true
-      EnableDnsHostnames: true
+      CidrBlock: !Ref 'VPCCIDR'
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
       Tags:
         - Key: Name
           Value: 'Network Lab VPC'
@@ -65,68 +47,42 @@ Resources:
   VPCDHCPOptionsAssociation:
     Type: AWS::EC2::VPCDHCPOptionsAssociation
     Properties:
-      VpcId: !Ref VPC
-      DhcpOptionsId: !Ref DHCPOptions
+      VpcId: !Ref 'VPC'
+      DhcpOptionsId: !Ref 'DHCPOptions'
 
-  PrivateSubnet2A:
+  PrivateSubnet1A:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PrivateSubnet2ACIDR
-      AvailabilityZone: !Ref AvailabilityZone1
+      VpcId: !Ref 'VPC'
+      CidrBlock: !Ref 'PrivateSubnet1ACIDR'
       Tags:
         - Key: Name
-          Value: 'Private subnet 2A'
+          Value: Private subnet 1A
         - Key: Network
           Value: Private
 
-  PrivateSubnet2B:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PrivateSubnet2BCIDR
-      AvailabilityZone: !Ref AvailabilityZone2
-      Tags:
-        - Key: Name
-          Value: 'Private subnet 2B'
-        - Key: Network
-          Value: Private
 
-  PrivateSubnetRouteTableA:
+  PrivateSubnetRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
-          Value: 'Private subnets A'
+          Value: Private subnets A
         - Key: Network
           Value: Private
 
-  PublicSubnet2A:
+  PublicSubnet1A:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PublicSubnet2ACIDR
-      AvailabilityZone: !Ref AvailabilityZone1
+      VpcId: !Ref 'VPC'
+      CidrBlock: !Ref 'PublicSubnet1ACIDR'
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: 'Public subnet 2A'
+          Value: Public subnet 1A
         - Key: Network
-          Value: Public
-
-  PublicSubnet2B:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Ref PublicSubnet2BCIDR
-      AvailabilityZone: !Ref AvailabilityZone2
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: 'Public subnet 2B'
-        - Key: Network
-          Value: Public
+          Value: Public      
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -138,51 +94,39 @@ Resources:
   VPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref VPC
-      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
 
-  PublicSubnetRouteTableA:
+  PublicSubnetRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
-          Value: 'Public subnets 2a'
+          Value: Public subnets 1a
         - Key: Network
           Value: Public
-
+    
   PublicSubnetRoute:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref PublicSubnetRouteTableA
+      RouteTableId: !Ref 'PublicSubnetRouteTable'
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway
+      GatewayId:  !Ref 'InternetGateway'
 
-  PublicSubnet2ARouteTableAssociation:
+  PublicSubnet1ARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PublicSubnet2A
-      RouteTableId: !Ref PublicSubnetRouteTableA
+      SubnetId: !Ref 'PublicSubnet1A'
+      RouteTableId: !Ref 'PublicSubnetRouteTable'
 
-  PublicSubnet2BRouteTableAssociation:
+  PrivateSubnet1ARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PublicSubnet2B
-      RouteTableId: !Ref PublicSubnetRouteTableA
+      SubnetId: !Ref 'PrivateSubnet1A'
+      RouteTableId: !Ref 'PrivateSubnetRouteTable'
 
-  PrivateSubnet2ARouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PrivateSubnet2A
-      RouteTableId: !Ref PrivateSubnetRouteTableA
-
-  PrivateSubnet2BRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PrivateSubnet2B
-      RouteTableId: !Ref PrivateSubnetRouteTableA
-
-  # Endpoints
+#########END POINTS
   CfnEndpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
@@ -191,7 +135,7 @@ Resources:
       VpcEndpointType: "Interface"
       PrivateDnsEnabled: true
       SubnetIds:
-        - !Ref PrivateSubnet2A
+        - !Ref PrivateSubnet1A
       SecurityGroupIds:
         - !Ref EndpointSG
 
@@ -206,11 +150,11 @@ Resources:
             Effect: Allow
             Resource: '*'
             Principal: '*'
-      RouteTableIds:
-        - !Ref PrivateSubnetRouteTableA
-        - !Ref PublicSubnetRouteTableA
-      ServiceName: !Join ['', ['com.amazonaws.', !Ref 'AWS::Region', '.s3']]
-      VpcId: !Ref VPC
+      RouteTableIds: 
+        - !Ref PrivateSubnetRouteTable
+        - !Ref PublicSubnetRouteTable
+      ServiceName: !Join ['', [com.amazonaws., !Ref 'AWS::Region', .s3]]
+      VpcId: !Ref 'VPC'
 
   STSEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -220,7 +164,7 @@ Resources:
       VpcEndpointType: "Interface"
       PrivateDnsEnabled: true
       SubnetIds:
-        - !Ref PrivateSubnet2A
+        - !Ref PrivateSubnet1A
       SecurityGroupIds:
         - !Ref EndpointSG
 
@@ -229,67 +173,50 @@ Resources:
     Properties:
       GroupDescription: "Traffic into CloudFormation Endpoint"
       SecurityGroupIngress:
-        - IpProtocol: tcp
+      -
+          IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: "192.29.10.0/24"
-        - IpProtocol: udp
+          CidrIp: "172.29.10.0/24"
+      -
+          IpProtocol: udp
           FromPort: 53
           ToPort: 53
-          CidrIp: "192.29.10.0/24"
+          CidrIp: "172.29.10.0/24"
       VpcId: !Ref VPC
       Tags:
-        - Key: Name
+        -
+          Key: Name
           Value: EndpointSG
 
 Outputs:
   VPCID:
     Description: VPC ID
-    Value: !Ref VPC
+    Value: !Ref 'VPC'
     Export:
-      Name: 'Network-VPC-A'
-  PrivateSubnet2A:
-    Description: Private subnet 2A
-    Value: !Ref PrivateSubnet2A
+      Name: 'Network-VPC'
+  PrivateSubnet1A:
+    Description: Private subnet 1A
+    Value: !Ref 'PrivateSubnet1A'
     Export:
-      Name: 'Network-PrivateSubnet2A'
-  PrivateSubnet2ACIDR:
-    Description: Private subnet 2A CIDR
-    Value: !Ref PrivateSubnet2ACIDR
+      Name: 'Network-PrivateSubnet1A'
+  PrivateSubnet1ACIDR:
+    Description: Private subnet 1A CIDR
+    Value: !Ref 'PrivateSubnet1ACIDR'
     Export:
-      Name: 'Network-PrivateSubnet2ACIDR'
-  PrivateSubnet2B:
-    Description: Private subnet 2B
-    Value: !Ref PrivateSubnet2B
-    Export:
-      Name: 'Network-PrivateSubnet2B'
-  PrivateSubnet2BCIDR:
-    Description: Private subnet 2B CIDR
-    Value: !Ref PrivateSubnet2BCIDR
-    Export:
-      Name: 'Network-PrivateSubnet2BCIDR'
-  PrivateSubnetRouteTableA:
+      Name: 'Network-PrivateSubnet1ACIDR'
+  PrivateSubnetRouteTable:
     Description: Subnet Route Table
-    Value: !Ref PrivateSubnetRouteTableA
+    Value: !Ref PrivateSubnetRouteTable
     Export:
-      Name: Network-PrivateSubnetRouteTableA
-  PublicSubnet2A:
-    Description: Public subnet 2A
-    Value: !Ref PublicSubnet2A
+      Name: Network-PrivateSubnetRouteTable
+  PublicSubnet1A:
+    Description: Private subnet 1A
+    Value: !Ref 'PublicSubnet1A'
     Export:
-      Name: 'Network-PublicSubnet2A'
-  PublicSubnet2ACIDR:
-    Description: Public subnet 2A CIDR
-    Value: !Ref PublicSubnet2ACIDR
+      Name: 'Network-PublicSubnet1A'
+  PublicSubnet1ACIDR:
+    Description: Private subnet 1A CIDR
+    Value: !Ref 'PrivateSubnet1ACIDR'
     Export:
-      Name: 'Network-2-PublicSubnet2ACIDR'
-  PublicSubnet2B:
-    Description: Public subnet 2B
-    Value: !Ref PublicSubnet2B
-    Export:
-      Name: 'Network-PublicSubnet2B'
-  PublicSubnet2BCIDR:
-    Description: Public subnet 2B CIDR
-    Value: !Ref PublicSubnet2BCIDR
-    Export:
-      Name: 'Network-2-PublicSubnet2BCIDR'
+      Name: 'Network-2-PublicSubnet1ACIDR'
