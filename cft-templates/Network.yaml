@@ -202,68 +202,68 @@ Resources:
       RouteTableId: !Ref 'PrivateSubnetRouteTable'
 
 #########END POINTS
-#  CfnEndpoint:
-#    Type: AWS::EC2::VPCEndpoint
-#    Properties:
-#      VpcId: !Ref VPC
-#      ServiceName: !Sub "com.amazonaws.${AWS::Region}.cloudformation"
-#      VpcEndpointType: "Interface"
-#      PrivateDnsEnabled: true
-#      SubnetIds:
-#        - !Ref PrivateSubnet1A
-#        - !Ref PrivateSubnet1B
-#      SecurityGroupIds:
-#        - !Ref EndpointSG
-#
-#  S3VPCEndpoint:
-#    Type: AWS::EC2::VPCEndpoint
-#    Properties:
-#      VpcId: !Ref VPC
-#      PolicyDocument:
-#        Version: '2012-10-17'
-#        Statement:
-#          - Action: '*'
-#            Effect: Allow
-#            Resource: '*'
-#            Principal: '*'
-#      RouteTableIds:
-#        - !Ref PrivateSubnetRouteTable
-#        - !Ref PublicSubnetRouteTable
-#      ServiceName: !Join ['', [com.amazonaws., !Ref 'AWS::Region', .s3]]
-#      VpcId: !Ref 'VPC'
-#
-#  STSEndpoint:
-#    Type: AWS::EC2::VPCEndpoint
-#    Properties:
-#      VpcId: !Ref VPC
-#      ServiceName: !Sub "com.amazonaws.${AWS::Region}.sts"
-#      VpcEndpointType: "Interface"
-#      PrivateDnsEnabled: true
-#      SubnetIds:
-#        - !Ref PrivateSubnet1A
-#      SecurityGroupIds:
-#        - !Ref EndpointSG
-#
-#  EndpointSG:
-#    Type: AWS::EC2::SecurityGroup
-#    Properties:
-#      GroupDescription: "Traffic into CloudFormation Endpoint"
-#      SecurityGroupIngress:
-#      -
-#          IpProtocol: tcp
-#          FromPort: 443
-#          ToPort: 443
-#          CidrIp: "172.29.10.0/24"
-#      -
-#          IpProtocol: udp
-#          FromPort: 53
-#          ToPort: 53
-#          CidrIp: "172.29.10.0/24"
-#      VpcId: !Ref VPC
-#      Tags:
-#        -
-#          Key: Name
-#          Value: EndpointSG
+  CfnEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.cloudformation"
+      VpcEndpointType: "Interface"
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1A
+        - !Ref PrivateSubnet1B
+      SecurityGroupIds:
+        - !Ref EndpointSG
+
+  S3VPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action: '*'
+            Effect: Allow
+            Resource: '*'
+            Principal: '*'
+      RouteTableIds:
+        - !Ref PrivateSubnetRouteTable
+        - !Ref PublicSubnetRouteTable
+      ServiceName: !Join ['', [com.amazonaws., !Ref 'AWS::Region', .s3]]
+      VpcId: !Ref 'VPC'
+
+  STSEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.sts"
+      VpcEndpointType: "Interface"
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref PrivateSubnet1A
+      SecurityGroupIds:
+        - !Ref EndpointSG
+
+  EndpointSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Traffic into CloudFormation Endpoint"
+      SecurityGroupIngress:
+      -
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: "172.29.10.0/24"
+      -
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: "172.29.10.0/24"
+      VpcId: !Ref VPC
+      Tags:
+        -
+          Key: Name
+          Value: EndpointSG
 
 Outputs:
   VPCID:
