@@ -94,7 +94,7 @@ Resources:
     DependsOn: ProductEC2
     Properties:
       ProductId: !Ref ProductId2
-      ProvisionedProductName: !Sub "Network-Product-chaining-${AWS::StackName}"
+      ProvisionedProductName: !Sub "RDS-Product-chaining-${AWS::StackName}"
       #ProvisioningArtifactName: "v1.0"
       #ProductName: network
       ProvisioningArtifactId: !Ref Product2Version
