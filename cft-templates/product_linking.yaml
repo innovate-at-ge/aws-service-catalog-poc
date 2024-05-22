@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Linked Products for EC2/VPC"
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: EC2 Instance Configuration
+        Parameters:
+          - ProductId2
+          - Product2Version
+      - Label:
+          default: VPC/Network Instance Configuration
+        Parameters:
+          - ProductId1
+          - Product1Version
+    ParameterLabels:
+      ProductId2:
+        default: EC2 Product ID
+      Product2Version:
+        default: EC2 Provisioned Artifact/Version ID
+      ProductId1:
+        default: VPC/Network Product ID
+      Product1Version:
+        default: VPC/Network Provisioned Artifact/Version ID 
+Parameters:
+  ProductId1:
+    Description: Network product to be launched, like prod-XXXXXXX
+    Type: String
+  Product1Version:
+    Description: Network product version to be launched, like pa-YYYYYYY
+    Type: String
+  ProductId2:
+    Description: EC2 product to be launched, like prod-WWWWWW
+    Type: String
+  Product2Version:
+    Description: EC2 product version to be launched, like pa-ZZZZZZZ
+    Type: String
+  VPCCIDR:
+    Type: String
+    Default: "172.29.10.0/24"
+  PrivateSubnet1ACIDR:
+    Default: 172.29.10.0/26
+    Description: CIDR block for private subnet 1A
+    Type: String
+  PublicSubnet1ACIDR:
+    Default: "172.29.10.128/26"
+    Description: CIDR block for private subnet
+    Type: String
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    AllowedValues:
+      - t2.micro
+      - t2.medium
+      - t3.micro
+      - t3.medium
+      - t3.large
+  LatestAmiId:
+    Type: "String"
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+Resources:
+  ProductNetwork:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductId: !Ref ProductId1
+      ProvisionedProductName: !Sub "Network-Product-chaining-${AWS::StackName}"
+      #ProvisioningArtifactName: "v1.0"
+      #ProductName: network
+      ProvisioningArtifactId: !Ref Product1Version
+      ProvisioningParameters:
+        - Key: VPCCIDR
+          Value: !Ref VPCCIDR
+        - Key: PrivateSubnet1ACIDR
+          Value: !Ref PrivateSubnet1ACIDR
+        - Key: PublicSubnet1ACIDR
+          Value: !Ref PublicSubnet1ACIDR
+
+  ProductEC2:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    DependsOn: ProductNetwork
+    Properties:
+      ProductId: !Ref ProductId2
+      #ProductName: "Simple Linux EC2"
+      ProvisionedProductName: !Sub "EC2-Product-chaining-${AWS::StackName}"
+      #ProvisioningArtifactName: EC2_v1.0
+      ProvisioningArtifactId: !Ref Product2Version
+      ProvisioningParameters:
+        - Key: InstanceType
+          Value: !Ref InstanceType
+        - Key: LatestAmiId
+          Value: !Ref LatestAmiId

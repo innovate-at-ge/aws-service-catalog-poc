@@ -1,0 +1,713 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS SC  RDS   products and portfolios",
+    "Metadata":
+    {
+        "AWS::CloudFormation::Interface":
+        {
+            "ParameterGroups":
+            [
+                {
+                    "Label":
+                    {
+                        "default": "Portfolio Information"
+                    },
+                    "Parameters":
+                    [
+                        "DisplayName",
+                        "PortfolioDescription",
+                        "ProviderName"
+                    ]
+                }
+            ]
+        }
+    },
+    "Outputs":
+    {
+                "LABenduser":
+        {
+            "Description": "Use this role for a rdslab  enduser",
+            "Value":
+            {
+                "Fn::Sub": "https://signin.aws.amazon.com/switchrole?account=${AWS::AccountId}&roleName=${Labenduser}&displayName=rdslabEndUser"
+            }
+        },
+        "LABAdmin":
+        {
+            "Description": "Use this role for a rdslab  Administrator",
+            "Value":
+            {
+                "Fn::Sub": "https://signin.aws.amazon.com/switchrole?account=${AWS::AccountId}&roleName=${labadmin}&displayName=rdslabAdmin"
+            }
+        },
+        "PortFolio":
+        {
+            "Description": "Service Catalog Portfolio URL",
+            "Value":
+            {
+                "Fn::Sub": "https://${AWS::Region}.console.aws.amazon.com/servicecatalog/home?region=${AWS::Region}#portfolios/${SCsampleport}"
+            }
+        }
+    },
+    "Parameters":
+    {
+        "DisplayName":
+        {
+            "Default": "SC Sample RDS Portfolio",
+            "Description": "Portfolio Name",
+            "Type": "String"
+        },
+        "PortfolioDescription":
+        {
+            "Default": "AWS SC Sample RDS Portfolio. Two Products included Lamp and S3",
+            "Description": "AWS SC Sample TF Portfolio",
+            "Type": "String"
+        },
+        "ProviderName":
+        {
+            "Default": "AWS Samples",
+            "Description": "Portfolio ProviderName",
+            "Type": "String"
+        }    },
+    "Resources":
+    {
+        "LRCSCproductDynamoDB":
+        {
+            "DependsOn":
+            [
+                "SCsampleport",
+                "ProdAsssociate07"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description": "SCproductSCproductDynamoDB",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "ProductId":
+                {
+                    "Ref": "SCproductDynamoDB"
+                },
+                "RoleArn":
+                {
+                    "Fn::GetAtt":
+                    [
+                        "Rolescssmlaunch",
+                        "Arn"
+                    ]
+                }
+            },
+            "Type": "AWS::ServiceCatalog::LaunchRoleConstraint"
+        },
+        "LRCSCproductRedshift":
+        {
+            "DependsOn":
+            [
+                "SCsampleport",
+                "ProdAsssociate06"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description": "SCproductSCproductRedshift",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "ProductId":
+                {
+                    "Ref": "SCproductRedshift"
+                },
+                "RoleArn":
+                {
+                    "Fn::GetAtt":
+                    [
+                        "Rolescssmlaunch",
+                        "Arn"
+                    ]
+                }
+            },
+            "Type": "AWS::ServiceCatalog::LaunchRoleConstraint"
+        },
+    
+        "LRCmsorcle":
+        {
+            "DependsOn":
+            [
+                "SCsampleport",
+                "ProdAsssociate01"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description": "SCproductOracle",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "ProductId":
+                {
+                    "Ref": "SCproductOracle"
+                },
+                "RoleArn":
+                {
+                    "Fn::GetAtt":
+                    [
+                        "Rolescssmlaunch",
+                        "Arn"
+                    ]
+                }
+            },
+            "Type": "AWS::ServiceCatalog::LaunchRoleConstraint"
+        },
+        "LRCmssql":
+        {
+            "DependsOn":
+            [
+                "SCsampleport",
+                "ProdAsssociate03"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description": "SCproductMSSqlsvrDescription",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "ProductId":
+                {
+                    "Ref": "SCproductMSSqlsvr"
+                },
+                "RoleArn":
+                {
+                    "Fn::GetAtt":
+                    [
+                        "Rolescssmlaunch",
+                        "Arn"
+                    ]
+                }
+            },
+            "Type": "AWS::ServiceCatalog::LaunchRoleConstraint"
+        },
+        "LRSCproductPostgres":
+        {
+            "DependsOn":
+            [
+                "SCsampleport",
+                "ProdAsssociate05"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description": "SCproductPostgresDescription",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "ProductId":
+                {
+                    "Ref": "SCproductPostgres"
+                },
+                "RoleArn":
+                {
+                    "Fn::GetAtt":
+                    [
+                        "Rolescssmlaunch",
+                        "Arn"
+                    ]
+                }
+            },
+            "Type": "AWS::ServiceCatalog::LaunchRoleConstraint"
+        },
+        "PortfolioPrincipal":
+        {
+            "DependsOn":
+            [
+                "SCsampleport"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "PrincipalARN":
+                {
+                    "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/${Labenduser}"
+                },
+                "PrincipalType": "IAM"
+            },
+            "Type": "AWS::ServiceCatalog::PortfolioPrincipalAssociation"
+        },
+        "ProdAsssociate01":
+        {
+            "DependsOn":
+            [
+                "SCsampleport",
+                "SCproductMSSqlsvr"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "ProductId":
+                {
+                    "Ref": "SCproductOracle"
+                }
+            },
+            "Type": "AWS::ServiceCatalog::PortfolioProductAssociation"
+        },
+        "ProdAsssociate03":
+        {
+            "DependsOn":
+            [
+                "SCsampleport",
+                "SCproductMSSqlsvr"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "ProductId":
+                {
+                    "Ref": "SCproductMSSqlsvr"
+                }
+            },
+            "Type": "AWS::ServiceCatalog::PortfolioProductAssociation"
+        },
+ 
+        "ProdAsssociate05":
+        {
+            "DependsOn":
+            [
+                "SCsampleport",
+                "SCproductPostgres"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "ProductId":
+                {
+                    "Ref": "SCproductPostgres"
+                }
+            },
+            "Type": "AWS::ServiceCatalog::PortfolioProductAssociation"
+        },
+        "ProdAsssociate06":
+        {
+            "DependsOn":
+            [
+                "SCsampleport",
+                "SCproductRedshift"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "ProductId":
+                {
+                    "Ref": "SCproductRedshift"
+                }
+            },
+            "Type": "AWS::ServiceCatalog::PortfolioProductAssociation"
+        },
+        "ProdAsssociate07":
+        {
+            "DependsOn":
+            [
+                "SCsampleport",
+                "SCproductDynamoDB"
+            ],
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "PortfolioId":
+                {
+                    "Ref": "SCsampleport"
+                },
+                "ProductId":
+                {
+                    "Ref": "SCproductDynamoDB"
+                }
+            },
+            "Type": "AWS::ServiceCatalog::PortfolioProductAssociation"
+        },
+        "Rolescssmlaunch":
+        {
+            "Properties":
+            {
+                "AssumeRolePolicyDocument":
+                {
+                    "Statement":
+                    [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal":
+                            {
+                                "Service":
+                                [
+                                    "servicecatalog.amazonaws.com",
+                                    "ssm.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "ManagedPolicyArns":
+                [
+                    "arn:aws:iam::aws:policy/AmazonSSMFullAccess",
+                    "arn:aws:iam::aws:policy/AmazonRDSFullAccess",
+                    "arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess" ,
+                    "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+                   
+                ],
+                "Path": "/",
+                "Policies":
+                [
+                    {
+                        "PolicyDocument":
+                        {
+                            "Statement":
+                            {
+                                    "Action":
+                                    [
+                                        "cloudformation:DescribeStackResource",
+                                        "cloudformation:DescribeStackResources",
+                                        "cloudformation:GetTemplate",
+                                        "cloudformation:List*",
+                                        "cloudformation:DescribeStackEvents",
+                                        "cloudformation:DescribeStacks",
+                                        "cloudformation:CreateStack",
+                                        "cloudformation:DeleteStack",
+                                        "cloudformation:DescribeStackEvents",
+                                        "cloudformation:DescribeStacks",
+                                        "cloudformation:GetTemplateSummary",
+                                        "cloudformation:SetStackPolicy",
+                                        "cloudformation:ValidateTemplate",
+                                        "cloudformation:UpdateStack",
+                                        "servicecatalog:ListServiceActionsForProvisioningArtifact",
+                                        "servicecatalog:ExecuteprovisionedProductServiceAction",
+                                        "ssm:DescribeDocument",
+                                        "ssm:GetAutomationExecution",
+                                        "ssm:StartAutomationExecution",
+                                        "ssm:StopAutomationExecution",
+                                        "cloudformation:ListStackResources",
+                                        "s3:GetObject"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": "*",
+                                    "Sid": "S3LaunchPolicySID"
+                                },
+                            "Version": "2012-10-17"
+                        },
+                        "PolicyName": "servicecatalog_mgt"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "SCproductPostgres":
+        {
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description": "Postgres",
+                "Distributor": "AWS MP Team Sample",
+                "Name": "Postgres",
+                "Owner": "MP Team",
+                "ProvisioningArtifactParameters":
+                [
+                    {
+                        "Description": "Postgres",
+                        "Info":
+                        {
+                            "LoadTemplateFromURL":
+                        {
+                                "Fn::Sub": "https://kenwalshtestad.s3.amazonaws.com/cfn/public/samples/sc_rds_db_postgres.json"
+                            }},
+                        "Name": "V1"
+                    }
+                ],
+                "SupportDescription": "Support Description",
+                "SupportEmail": "awsmp@example.com",
+                "SupportUrl": "https://support.com"
+            },
+            "Type": "AWS::ServiceCatalog::CloudFormationProduct"
+        },
+        "SCproductDynamoDB":
+        {
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description": "DynamoDB",
+                "Distributor": "AWS MP Team Sample",
+                "Name": "DynamoDB",
+                "Owner": "MP Team",
+                "ProvisioningArtifactParameters":
+                [
+                    {
+                        "Description": "DynamoDB",
+                        "Info":
+                        {
+                            "LoadTemplateFromURL":
+                            {
+                                "Fn::Sub": "https://kwdem0s.s3.amazonaws.com/content/scrds/templates/sc-dynamodb.json"
+
+                            }
+                        },
+                        "Name": "V1"
+                    }
+                ],
+                "SupportDescription": "Support Description",
+                "SupportEmail": "awsmp@example.com",
+                "SupportUrl": "https://support.com"
+            },
+            "Type": "AWS::ServiceCatalog::CloudFormationProduct"
+        },
+         
+        "SCproductRedshift":
+        {
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description": "Redshift",
+                "Distributor": "AWS MP Team Sample",
+                "Name": "Redshift",
+                "Owner": "MP Team",
+                "ProvisioningArtifactParameters":
+                [
+                    {
+                        "Description": "Redshift",
+                        "Info":
+                        {
+                            "LoadTemplateFromURL":
+                            {
+                                "Fn::Sub": "https://kwdem0s.s3.amazonaws.com/content/scrds/templates/sc-dbs-redshift.json"
+                            }
+                        },
+                        "Name": "V1"
+                    }
+                ],
+                "SupportDescription": "Support Description",
+                "SupportEmail": "awsmp@example.com",
+                "SupportUrl": "https://support.com"
+            },
+            "Type": "AWS::ServiceCatalog::CloudFormationProduct"
+        },
+        "SCproductMSSqlsvr":
+        {
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description": "MSSqlServer",
+                "Distributor": "AWS MP Team Sample",
+                "Name": "MSSqlServer",
+                "Owner": "MP Team",
+                "ProvisioningArtifactParameters":
+                [
+                    {
+                        "Description": "MSSqlServer",
+                        "Info":
+                        {
+                            "LoadTemplateFromURL":
+                            {
+                                "Fn::Sub": "https://kwdem0s.s3.amazonaws.com/content/scrds/templates/sc-rds-mssql.json"
+                            }
+                        },
+                        "Name": "V1"
+                    }
+                ],
+                "SupportDescription": "Support Description",
+                "SupportEmail": "awsmp@example.com",
+                "SupportUrl": "https://support.com"
+            },
+            "Type": "AWS::ServiceCatalog::CloudFormationProduct"
+        },
+        "SCproductOracle":
+        {
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description": "Oracle",
+                "Distributor": "AWS MP Team Sample",
+                "Name": "Oracle",
+                "Owner": "MP Team",
+                "ProvisioningArtifactParameters":
+                [
+                    {
+                        "Description": "RDS Oracle",
+                        "Info":
+                        {
+                            "LoadTemplateFromURL":
+                            {
+                                "Fn::Sub": "https://kwdem0s.s3.amazonaws.com/content/scrds/templates/sc-rds-orcl2.json"
+                            }
+                        },
+                        "Name": "V1"
+                    }
+                ],
+                "SupportDescription": "Support Description",
+                "SupportEmail": "awsmp@example.com",
+                "SupportUrl": "https://support.com"
+            },
+            "Type": "AWS::ServiceCatalog::CloudFormationProduct"
+        },
+    
+        "SCsampleport":
+        {
+            "Properties":
+            {
+                "AcceptLanguage": "en",
+                "Description":
+                {
+                    "Ref": "PortfolioDescription"
+                },
+                "DisplayName":
+                {
+                    "Ref": "DisplayName"
+                },
+                "ProviderName":
+                {
+                    "Ref": "ProviderName"
+                }
+            },
+            "Type": "AWS::ServiceCatalog::Portfolio"
+        },
+                "Labenduser":
+        {
+            "Properties":
+            {
+                "AssumeRolePolicyDocument":
+                {
+                    "Statement":
+                    [
+                        {
+                            "Action":
+                            [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal":
+                            {
+                                "AWS":
+                                [
+                                    {
+                                        "Ref": "AWS::AccountId"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "ManagedPolicyArns":
+                [
+                    "arn:aws:iam::aws:policy/AWSServiceCatalogEndUserFullAccess",
+                    "arn:aws:iam::aws:policy/AWSServiceCatalogEndUserReadOnlyAccess"
+                ],
+                "Path": "/",
+                "Policies":
+                [
+                    {
+                        "PolicyDocument":
+                        {
+                            "Version": "2012-10-17",
+                            "Statement":
+                            [
+                                {
+                                    "Resource": "*",
+                                    "Effect": "Allow",
+                                    "Action":
+                                    [
+                                        "ec2:RunInstances",
+                                        "ec2:AuthorizeSecurityGroupIngress",
+                                        "ec2:CreateSecurityGroup"
+                                    ]
+                                }
+                            ]
+                        },
+                        "PolicyName": "privLabenduser"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "labadmin":
+        {
+            "Properties":
+            {
+                "AssumeRolePolicyDocument":
+                {
+                    "Statement":
+                    [
+                        {
+                            "Action":
+                            [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal":
+                            {
+                                "AWS":
+                                [
+                                    {
+                                        "Ref": "AWS::AccountId"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "ManagedPolicyArns":
+                [
+                    "arn:aws:iam::aws:policy/AWSPrivateMarketplaceAdminFullAccess",
+                    "arn:aws:iam::aws:policy/AWSServiceCatalogAdminFullAccess",
+                    "arn:aws:iam::aws:policy/AWSServiceCatalogAppRegistryFullAccess"
+                ],
+                "Path": "/",
+                "Policies":
+                [
+                    {
+                        "PolicyDocument":
+                        {
+                            "Version": "2012-10-17",
+                            "Statement":
+                            [
+                                {
+                                    "Resource": "*",
+                                    "Effect": "Allow",
+                                    "Action":
+                                    [
+                                        "ec2:RunInstances"
+                                    ]
+                                }
+                            ]
+                        },
+                        "PolicyName": "privlabadmin"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Role"
+        }
+    }
+}

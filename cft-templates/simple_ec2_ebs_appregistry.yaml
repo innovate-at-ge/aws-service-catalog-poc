@@ -37,7 +37,7 @@ Resources:
           IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 172.29.10.0/24
+          CidrIp: 0.0.0.0/0
         - Description: allow incoming HTTPS
           IpProtocol: tcp
           FromPort: 443
