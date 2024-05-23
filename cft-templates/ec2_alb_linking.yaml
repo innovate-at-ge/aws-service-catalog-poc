@@ -10,6 +10,7 @@ Metadata:
           - Product1Version
           - VPC
           - SubnetID
+          - LoadbalancerName
           - TargetGroupName
       - Label:
           default: EC2 Configuration
@@ -48,7 +49,7 @@ Parameters:
   Product1Version:
     Description: ALB version to be launched, like pa-YYYYYYY
     Type: String
-    Default: pa-6w7qshoesu5vs
+    Default: pa-gdav7hv7v4q6w
   ProductId2:
     Description: EC2 product to be launched, like prod-WWWWWW
     Type: String
@@ -63,6 +64,9 @@ Parameters:
   VPC:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID
+  LoadbalancerName:
+    Type: String
+    Description: Unique Loadbalancer name
   TargetGroupName:
     Type: String
   InstanceType:
@@ -108,6 +112,8 @@ Resources:
           Value: !Ref VPC
         - Key: SubnetID
           Value: !Join [ ",", !Ref SubnetID ]
+        - Key: LoadbalancerName
+          Value: !Ref LoadbalancerName
         - Key: TargetGroupName
           Value: !Ref TargetGroupName
         - Key: UAI
