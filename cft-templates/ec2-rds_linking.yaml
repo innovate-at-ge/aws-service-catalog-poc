@@ -25,19 +25,19 @@ Metadata:
 Parameters:
   ProductId1:
     Description: EC2 product to be launched, like prod-XXXXXXX
-    Default: prod-jhhuq5msjzjfm
+    Default: prod-gy654ne4bx52y
     Type: String
   Product1Version:
     Description: EC2 product version to be launched, like pa-YYYYYYY
-    Default: pa-bxddepodr4fk6
+    Default: pa-vrpoaij6qmy5s
     Type: String
   ProductId2:
     Description: RDS product to be launched, like prod-WWWWWW
-    Default: prod-bdbwmes5rsumc
+    Default: prod-tlrpuycehnygc
     Type: String
   Product2Version:
     Description: RDS product version to be launched, like pa-ZZZZZZZ
-    Default: pa-6soz76gkat6y4
+    Default: pa-xnvmizyb5ei3w
     Type: String
   VPCName:
     Type: AWS::EC2::VPC::Id
