@@ -10,6 +10,7 @@ Metadata:
           - Product1Version
           - SubnetID
           - VPC
+          - TargetGroupName
       - Label:
           default: EC2 Configuration
         Parameters:
@@ -47,7 +48,7 @@ Parameters:
   Product1Version:
     Description: ALB version to be launched, like pa-YYYYYYY
     Type: String
-    Default: pa-mwityrrs2drmu
+    Default: pa-6w7qshoesu5vs
   ProductId2:
     Description: EC2 product to be launched, like prod-WWWWWW
     Type: String
@@ -62,6 +63,8 @@ Parameters:
   VPC:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID
+  TargetGroupName:
+    Type: String
   InstanceType:
     Type: String
     Default: t3.micro
@@ -105,6 +108,8 @@ Resources:
           Value: !Ref VPC
         - Key: SubnetID
           Value: !Join [ ",", !Ref SubnetID ]
+        - Key: TargetGroupName
+          Value: !Ref TargetGroupName
         - Key: UAI
           Value: !Ref UAI
         - Key: CI
@@ -117,7 +122,6 @@ Resources:
           Value: !Ref CreatedBy
   ProductEC2:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
-    DependsOn: ProductALB
     Properties:
       ProductId: !Ref ProductId2
       #ProductName: "Simple Linux EC2"
