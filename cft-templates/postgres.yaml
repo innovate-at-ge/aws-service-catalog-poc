@@ -74,13 +74,13 @@ Parameters:
     MinValue: '5'
     MaxValue: '6144'
     ConstraintDescription: must be between 5+
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID
   PrivateSubnetID:
     Type: List<AWS::EC2::Subnet::Id>
     Description: 'List Id of existing Private subnets '
     ConstraintDescription: Must be an existing Private subnets.
-  VPC:
-    Type: AWS::EC2::VPC::Id
-    Description: VPC ID
   UAI:
     Type: String
     AllowedPattern: ^uai\d{7}
