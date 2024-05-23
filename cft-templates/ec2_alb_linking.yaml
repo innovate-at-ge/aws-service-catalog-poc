@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Linked Products for EC2/VPC"
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: ALB Instance Configuration
+        Parameters:
+          - ProductId1
+          - Product1Version
+          - SubnetID
+          - VPC
+      - Label:
+          default: EC2 Configuration
+        Parameters:
+          - ProductId2
+          - Product2Version
+          - LatestAmiId
+          - InstanceType
+      - Label: 
+          default: Tags
+        Parameters:
+          - UAI
+          - CI
+          - Environment
+          - OwnershipTeamEmail
+          - CreatedBy
+    ParameterLabels:
+      ProductId1: ALB Product ID
+      Product1Version: ALB Provisioned Artifact/Version ID 
+      ProductId2: EC2 Product ID
+      Product2Version: EC2 Provisioned Artifact/Version ID
+      SubnetID: Subnet IDs
+      VPC: VPC
+      InstanceType: Linux Instance Type
+      LatestAmiId: SSM key to the latest Amazon linux AMI
+      UAI: UAI
+      CI: CI
+      Environment: Environment
+      OwnershipTeamEmail: Ownership Team Email
+      CreatedBy: Created By (SSO)
+Parameters:
+  ProductId1:
+    Description: ALB product to be launched, like prod-XXXXXXX
+    Type: String
+    Default: prod-va4rlrz65pnmm
+  Product1Version:
+    Description: ALB version to be launched, like pa-YYYYYYY
+    Type: String
+    Default: pa-mwityrrs2drmu
+  ProductId2:
+    Description: EC2 product to be launched, like prod-WWWWWW
+    Type: String
+    Default: prod-igr3zku5ogslc
+  Product2Version:
+    Description: EC2 product version to be launched, like pa-ZZZZZZZ
+    Type: String
+    Default: pa-hqmhd4o57d6pw
+  SubnetID:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    AllowedValues:
+      - t2.micro
+      - t2.medium
+      - t3.micro
+      - t3.medium
+      - t3.large
+  LatestAmiId:
+    Type: "String"
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  UAI:
+    Type: String
+    AllowedPattern: ^uai\d{7}
+  CI:
+    Type: String
+    AllowedPattern: ^\d{10}$
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - qa
+      - prod
+  OwnershipTeamEmail:
+    Type: String
+  CreatedBy:
+    Type: String
+    AllowedPattern: ^\d{9}$
+Resources:
+  ProductALB:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductId: !Ref ProductId1
+      ProvisionedProductName: !Sub "ALB-Product-chaining-${AWS::StackName}"
+      #ProvisioningArtifactName: "v1.0"
+      #ProductName: network
+      ProvisioningArtifactId: !Ref Product1Version
+      ProvisioningParameters:
+        - Key: VPC
+          Value: !Ref VPC
+        - Key: SubnetID
+          Value: !Join [ ",", !Ref SubnetID ]
+        - Key: UAI
+          Value: !Ref UAI
+        - Key: CI
+          Value: !Ref CI
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: OwnershipTeamEmail
+          Value: !Ref OwnershipTeamEmail
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
+  ProductEC2:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    DependsOn: ProductALB
+    Properties:
+      ProductId: !Ref ProductId2
+      #ProductName: "Simple Linux EC2"
+      ProvisionedProductName: !Sub "EC2-Product-chaining-${AWS::StackName}"
+      #ProvisioningArtifactName: EC2_v1.0
+      ProvisioningArtifactId: !Ref Product2Version
+      ProvisioningParameters:
+        - Key: InstanceType
+          Value: !Ref InstanceType
+        - Key: LatestAmiId
+          Value: !Ref LatestAmiId
+        - Key: UAI
+          Value: !Ref UAI
+        - Key: CI
+          Value: !Ref CI
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: OwnershipTeamEmail
+          Value: !Ref OwnershipTeamEmail
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
