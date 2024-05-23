@@ -18,9 +18,9 @@ Parameters:
     Type: String
   VPCCIDR:
     Type: String
-    Default: '172.29.10.0/24'
+    Default: '172.0.0.0/20'
   PrivateSubnet1ACIDR:
-    Default: '172.29.10.128/28'
+    Default: '172.0.0.0/24'
     Description: CIDR block for private subnet 1A
     Type: String
   PrivateSubnet1AName:
@@ -28,7 +28,7 @@ Parameters:
     Description: Name for private subnet 1A
     Type: String
   PrivateSubnet1BCIDR:
-    Default: '172.29.10.144/28'
+    Default: '172.0.1.0/24'
     Description: CIDR block for private subnet 1B
     Type: String
   PrivateSubnet1BName:
@@ -36,7 +36,7 @@ Parameters:
     Description: Name for private subnet 1B
     Type: String
   PublicSubnet1ACIDR:
-    Default: '172.29.10.0/28'
+    Default: '172.0.8.0/24'
     Description: CIDR block for public subnet 1A
     Type: String
   PublicSubnet1AName:
@@ -44,7 +44,7 @@ Parameters:
     Description: Name for public subnet 1A
     Type: String
   PublicSubnet1BCIDR:
-    Default: '172.29.10.16/28'
+    Default: '172.0.9.0/24'
     Description: CIDR block for public subnet 1B
     Type: String
   PublicSubnet1BName:
