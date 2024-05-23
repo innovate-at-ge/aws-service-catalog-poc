@@ -14,6 +14,10 @@ Metadata:
           - ProductId1
           - Product1Version
       - Label:
+          default: ALB configuration
+        Parameters:
+          - TargetGroupName
+      - Label:
           default: Tags
         Parameters:
           - UAI
@@ -53,14 +57,15 @@ Parameters:
     Type: String
   Product3Version:
     Description: ALB product version to be launched, like pa-ZZZZZZZ
-    Default: pa-mwityrrs2drmu
+    Default: pa-6w7qshoesu5vs
     Type: String
   VPCName:
     Type: AWS::EC2::VPC::Id
   PrivateSubnetID:
     Type: List<AWS::EC2::Subnet::Id>
     Description: "List Id of existing Private subnets"
-
+  TargetGroupName:
+    Type: String
   InstanceType:
     Type: String
     Default: t3.micro
@@ -144,6 +149,8 @@ Resources:
           Value: !Ref VPCName
         - Key: SubnetID
           Value: !Join [ ",", !Ref PrivateSubnetID ]
+        - Key: TargetGroupName
+          Value: !Ref TargetGroupName
         - Key: UAI
           Value: !Ref UAI
         - Key: CI
