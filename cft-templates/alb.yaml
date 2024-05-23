@@ -7,6 +7,7 @@ Metadata:
         Parameters:
           - SubnetID
           - VPC
+          - LoadbalancerName
           - TargetGroupName
       - Label: 
           default: Tags
@@ -26,12 +27,15 @@ Metadata:
       OwnershipTeamEmail: Ownership Team Email
       CreatedBy: Created By (SSO)
 Parameters:
-  SubnetID:
-    Type: List<AWS::EC2::Subnet::Id>
-    Description: Subnet IDs
   VPC:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID
+  SubnetID:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs
+  LoadbalancerName:
+    Type: String
+    Description: Unique Loadbalancer name
   TargetGroupName:
     Type: String
     Description: Unique Target group name
@@ -105,7 +109,7 @@ Resources:
   ApplicationLoadBalancer: 
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: application-load-balancer
+      Name: !Ref LoadbalancerName
       SecurityGroups: 
         - !GetAtt ALBSecurityGroup.GroupId
       Subnets: 
