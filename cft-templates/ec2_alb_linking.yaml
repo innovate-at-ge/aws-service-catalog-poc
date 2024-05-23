@@ -8,8 +8,8 @@ Metadata:
         Parameters:
           - ProductId1
           - Product1Version
-          - SubnetID
           - VPC
+          - SubnetID
           - TargetGroupName
       - Label:
           default: EC2 Configuration
