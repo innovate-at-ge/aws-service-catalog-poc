@@ -7,11 +7,25 @@ Metadata:
         Parameters:
           - LinuxInstanceType
           - LatestAmiId
+      - Label:
+          default: Tags
+        Parameters:
+          - UAI
+          - CI
+          - Environment
+          - OwnershipTeamEmail
+          - CreatedBy
     ParameterLabels:
       LinuxInstanceType:
         default: Linux Instance Type
       LatestAmiId:
         default: SSM key to the latest Amazon linux AMI
+      UAI: UAI
+      CI: CI
+      Environment: Environment
+      OwnershipTeamEmail: Ownership Team Email
+      CreatedBy: Created By (SSO)
+
 Parameters:
   InstanceType:
     Type: String
@@ -25,6 +39,23 @@ Parameters:
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  UAI:
+    Type: String
+    AllowedPattern: ^uai\d{7}
+  CI:
+    Type: String
+    AllowedPattern: ^\d{10}$
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - qa
+      - prod
+  OwnershipTeamEmail:
+    Type: String
+  CreatedBy:
+    Type: String
+    AllowedPattern: ^\d{9}$
 
 Resources:
   WebSecurityGroup:
@@ -100,6 +131,16 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub 'EC2-Apache-${AWS::StackName}'
+        - Key: UAI
+          Value: !Ref UAI
+        - Key: CI
+          Value: !Ref CI
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: OwnershipTeamEmail
+          Value: !Ref OwnershipTeamEmail
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
       SecurityGroupIds:
         - !GetAtt 
           - WebSecurityGroup

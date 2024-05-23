@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: DB,RDSPostgres,v1.0,PostgreSQL RDS Template. beta-fdp-1p7mq4sr4
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: Database Parameters
+        Parameters:
+          - DBAllocatedStorage
+          - DBClass
+          - DBName
+          - DBUsername
+          - DBPassword
+          - PrivateSubnetID
+          - VPC
+      - Label:
+          default: Tags
+        Parameters:
+          - UAI
+          - CI
+          - Environment
+          - OwnershipTeamEmail
+          - CreatedBy
+    ParameterLabels:
+      DBName: Database Name
+      DBClass: Database Class
+      DBAllocatedStorage: Database Allocated Storage
+      DBUsername: Database Username
+      DBPassword: Database Password
+      PrivateSubnetID: Private Subnet ID
+      VPC: VPC
+      UAI: UAI
+      CI: CI
+      Environment: Environment
+      OwnershipTeamEmail: Ownership Team Email
+      CreatedBy: Created By (SSO)
+
+Parameters:
+  DBName:
+    Default: pgdb
+    Description: The database name
+    Type: String
+    MinLength: '1'
+    MaxLength: '8'
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBUsername:
+    Default: root
+    NoEcho: 'true'
+    Description: The database admin account username
+    Type: String
+    MinLength: '1'
+    MaxLength: '16'
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBPassword:
+    Default: root1234
+    NoEcho: 'true'
+    Description: The database admin account password
+    Type: String
+    MinLength: '8'
+  DBClass:
+    Default: db.m6g.large
+    Description: Database instance class
+    Type: String
+    AllowedValues:
+      - db.m4.large
+      - db.m6g.large
+    ConstraintDescription: must select a valid database instance type.
+  DBAllocatedStorage:
+    Default: '5'
+    Description: The size of the database (Gb)
+    Type: Number
+    MinValue: '5'
+    MaxValue: '6144'
+    ConstraintDescription: must be between 5+
+  PrivateSubnetID:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: 'List Id of existing Private subnets '
+    ConstraintDescription: Must be an existing Private subnets.
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID
+  UAI:
+    Type: String
+    AllowedPattern: ^uai\d{7}
+  CI:
+    Type: String
+    AllowedPattern: ^\d{10}$
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - qa
+      - prod
+  OwnershipTeamEmail:
+    Type: String
+  CreatedBy:
+    Type: String
+    AllowedPattern: ^\d{9}$
+
+Resources:
+  myDBEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Frontend Access
+      VpcId:
+        Ref: VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 10.0.0.0/16
+
+  myDBParamGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: Database Parameter Group + pg_stat_statements
+      Family: postgres16
+      Parameters:
+        shared_preload_libraries: pgaudit,pg_stat_statements,plprofiler
+        rds.force_ssl: 1
+        pgaudit.log: ROLE,DDL
+        pgaudit.log_level: info
+        pgaudit.role: rds_pgaudit
+        pgaudit.log_statement_once: 1
+        log_destination: csvlog
+        log_connections: 1
+        log_disconnections: 1
+        max_connections: 6
+
+  myDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: DB Private Subnet
+      SubnetIds:
+        Ref: PrivateSubnetID
+
+  pgDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBName:
+        Ref: DBName
+      AllocatedStorage:
+        Ref: DBAllocatedStorage
+      DBInstanceClass:
+        Ref: DBClass
+      Engine: postgres
+      MasterUsername:
+        Ref: DBUsername
+      MasterUserPassword:
+        Ref: DBPassword
+      DBSubnetGroupName:
+        Ref: myDBSubnetGroup
+      DBParameterGroupName:
+        Ref: myDBParamGroup
+      VPCSecurityGroups:
+        - Fn::GetAtt:
+            - myDBEC2SecurityGroup
+            - GroupId
+      Tags:
+        - Key: UAI
+          Value: !Ref UAI
+        - Key: CI
+          Value: !Ref CI
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: OwnershipTeamEmail
+          Value: !Ref OwnershipTeamEmail
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
+
+Outputs:
+  JDBCConnectionString:
+    Description: JDBC connection string for database
+    Value:
+      Fn::Join:
+        - ''
+        - - jdbc:postgresql://
+          - Fn::GetAtt:
+              - pgDB
+              - Endpoint.Address
+          - ":"
+          - Fn::GetAtt:
+              - pgDB
+              - Endpoint.Port
+          - "/"
+          - Ref: DBName

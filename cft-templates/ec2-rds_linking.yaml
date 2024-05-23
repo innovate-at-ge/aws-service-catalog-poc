@@ -13,6 +13,14 @@ Metadata:
         Parameters:
           - ProductId1
           - Product1Version
+      - Label:
+          default: Tags
+        Parameters:
+          - UAI
+          - CI
+          - Environment
+          - OwnershipTeamEmail
+          - CreatedBy
     ParameterLabels:
       ProductId2:
         default: RDS Product ID
@@ -25,19 +33,19 @@ Metadata:
 Parameters:
   ProductId1:
     Description: EC2 product to be launched, like prod-XXXXXXX
-    Default: prod-gy654ne4bx52y
+    Default: prod-xyi3gi552yiha
     Type: String
   Product1Version:
     Description: EC2 product version to be launched, like pa-YYYYYYY
-    Default: pa-vrpoaij6qmy5s
+    Default: pa-64rhrlqeau3ls
     Type: String
   ProductId2:
     Description: RDS product to be launched, like prod-WWWWWW
-    Default: prod-tlrpuycehnygc
+    Default: prod-fzx4okfauuivg
     Type: String
   Product2Version:
     Description: RDS product version to be launched, like pa-ZZZZZZZ
-    Default: pa-xnvmizyb5ei3w
+    Default: pa-fat6v4mxyabau
     Type: String
   VPCName:
     Type: AWS::EC2::VPC::Id
@@ -74,6 +82,23 @@ Parameters:
   DBAllocatedStorage:
     Type: Number
     Default: 5
+  UAI:
+    Type: String
+    AllowedPattern: ^uai\d{7}
+  CI:
+    Type: String
+    AllowedPattern: ^\d{10}$
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - qa
+      - prod
+  OwnershipTeamEmail:
+    Type: String
+  CreatedBy:
+    Type: String
+    AllowedPattern: ^\d{9}$
 Resources:
   ProductEC2:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
@@ -88,6 +113,16 @@ Resources:
           Value: !Ref InstanceType
         - Key: LatestAmiId
           Value: !Ref LatestAmiId
+        - Key: UAI
+          Value: !Ref UAI
+        - Key: CI
+          Value: !Ref CI
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: OwnershipTeamEmail
+          Value: !Ref OwnershipTeamEmail
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
 
   ProductRDS:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
@@ -113,3 +148,13 @@ Resources:
           Value: !Ref DBClass
         - Key: DBAllocatedStorage
           Value: !Ref DBAllocatedStorage
+        - Key: UAI
+          Value: !Ref UAI
+        - Key: CI
+          Value: !Ref CI
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: OwnershipTeamEmail
+          Value: !Ref OwnershipTeamEmail
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
