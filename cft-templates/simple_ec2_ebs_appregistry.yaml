@@ -107,8 +107,7 @@ Resources:
                 - |+
 
                 - - >-
-                    <h1>Congratulations, you have successfully launched the
-                    Apache webserver demo.</h1>
+                    <h1>GE Aerospace Innovation week powered by Defense and Systems</h1>
               mode: '000644'
               owner: root
               group: root
