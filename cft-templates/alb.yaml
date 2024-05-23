@@ -7,6 +7,7 @@ Metadata:
         Parameters:
           - SubnetID
           - VPC
+          - TargetGroupName
       - Label: 
           default: Tags
         Parameters:
@@ -18,6 +19,7 @@ Metadata:
     ParameterLabels:
       SubnetID: Private Subnet ID
       VPC: VPC
+      TargetGroupName: TargetGroupName
       UAI: UAI
       CI: CI
       Environment: Environment
@@ -30,6 +32,9 @@ Parameters:
   VPC:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID
+  TargetGroupName:
+    Type: String
+    Description: Unique Target group name
   UAI:
     Type: String
     AllowedPattern: ^uai\d{7}
@@ -125,7 +130,7 @@ Resources:
   ALBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: WebServer 
+      Name: !Ref TargetGroupName
       VpcId: !Ref VPC
       Port: 80
       Protocol: HTTP
