@@ -41,11 +41,11 @@ Parameters:
     Type: String
   ProductId2:
     Description: RDS product to be launched, like prod-WWWWWW
-    Default: prod-fzx4okfauuivg
+    Default: prod-ydntof25gxqry
     Type: String
   Product2Version:
     Description: RDS product version to be launched, like pa-ZZZZZZZ
-    Default: pa-fat6v4mxyabau
+    Default: pa-4zajx7nakjmlo
     Type: String
   VPCName:
     Type: AWS::EC2::VPC::Id
