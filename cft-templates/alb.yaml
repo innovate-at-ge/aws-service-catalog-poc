@@ -1,0 +1,160 @@
+Description: Create Application Load Balancer
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: Application Load Balancer Parameters
+        Parameters:
+          - SubnetID
+          - VPC
+      - Label: 
+          default: Tags
+        Parameters:
+          - UAI
+          - CI
+          - Environment
+          - OwnershipTeamEmail
+          - CreatedBy
+    ParameterLabels:
+      SubnetID: Private Subnet ID
+      VPC: VPC
+      UAI: UAI
+      CI: CI
+      Environment: Environment
+      OwnershipTeamEmail: Ownership Team Email
+      CreatedBy: Created By (SSO)
+Parameters:
+  SubnetID:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID
+  UAI:
+    Type: String
+    AllowedPattern: ^uai\d{7}
+  CI:
+    Type: String
+    AllowedPattern: ^\d{10}$
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - qa
+      - prod
+  OwnershipTeamEmail:
+    Type: String
+  CreatedBy:
+    Type: String
+    AllowedPattern: ^\d{9}$
+Resources:
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Security Group for ALB'
+      VpcId: !Ref VPC
+      Tags:
+        - Key: UAI
+          Value: !Ref UAI
+        - Key: CI
+          Value: !Ref CI
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: OwnershipTeamEmail
+          Value: !Ref OwnershipTeamEmail
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
+  rIngress1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ALBSecurityGroup
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      CidrIp: 10.0.0.0/8
+  rIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ALBSecurityGroup
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      CidrIp: 3.0.0.0/8
+  rIngress3:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ALBSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      CidrIp: 10.0.0.0/8
+  rIngress4:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ALBSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      CidrIp: 3.0.0.0/8
+
+  ApplicationLoadBalancer: 
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: application-load-balancer
+      SecurityGroups: 
+        - !GetAtt ALBSecurityGroup.GroupId
+      Subnets: 
+        Ref: SubnetID
+      LoadBalancerAttributes: 
+        - Key: idle_timeout.timeout_seconds
+          Value: "60"
+      Scheme: internal
+      Tags:
+        - Key: UAI
+          Value: !Ref UAI
+        - Key: CI
+          Value: !Ref CI
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: OwnershipTeamEmail
+          Value: !Ref OwnershipTeamEmail
+        - Key: CreatedBy
+          Value: !Ref CreatedBy
+
+# Create Target Group 
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: WebServer 
+      VpcId: !Ref VPC
+      Port: 80
+      Protocol: HTTP
+
+#Create a Listener on Port 80 
+  ALBListenerNoSslCertificate: 
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+      LoadBalancerArn: !Ref ApplicationLoadBalancer 
+      Port: 80
+      Protocol: HTTP
+    
+Outputs:
+# Export ALB SG
+  ALBSecurityGroupId:
+    Description: The security group ID to use for the Security Group
+    Value: !GetAtt ALBSecurityGroup.GroupId
+# Export Target Group 
+  ALBTargetGroup:    
+    Description: Webserver target group
+    Value: !Ref ALBTargetGroup
+# Export Application Load Balancer DNS Name
+  ApplicationLoadBalancerDnsName:
+    Description: Application Load Balancer DNS Name
+    Value: !GetAtt ApplicationLoadBalancer.DNSName 
+# Export Application Load Balancer Zone ID 
+  ApplicationLoadBalancerZoneID:
+    Description: Application Load Balancer Canonical Hosted Zone ID 
+    Value: !GetAtt ApplicationLoadBalancer.CanonicalHostedZoneID
