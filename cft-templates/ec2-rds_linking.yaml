@@ -33,11 +33,11 @@ Metadata:
 Parameters:
   ProductId1:
     Description: EC2 product to be launched, like prod-XXXXXXX
-    Default: prod-xyi3gi552yiha
+    Default: prod-okadq7mduzwsu
     Type: String
   Product1Version:
     Description: EC2 product version to be launched, like pa-YYYYYYY
-    Default: pa-64rhrlqeau3ls
+    Default: pa-j6vatqa27mfio
     Type: String
   ProductId2:
     Description: RDS product to be launched, like prod-WWWWWW
