@@ -57,7 +57,7 @@ Parameters:
   Product2Version:
     Description: EC2 product version to be launched, like pa-ZZZZZZZ
     Type: String
-    Default: pa-634xrt7x3xcsi
+    Default: pa-muorhsjrrnbn2
   SubnetID:
     Type: List<AWS::EC2::Subnet::Id>
     Description: Subnet IDs

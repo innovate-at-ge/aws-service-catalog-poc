@@ -37,7 +37,7 @@ Parameters:
     Type: String
   Product1Version:
     Description: EC2 product version to be launched, like pa-YYYYYYY
-    Default: pa-634xrt7x3xcsi
+    Default: pa-muorhsjrrnbn2
     Type: String
   ProductId2:
     Description: RDS product to be launched, like prod-WWWWWW
