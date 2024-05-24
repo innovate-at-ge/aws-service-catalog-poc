@@ -73,12 +73,12 @@ Resources:
           IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: 172.29.10.0/24
+          CidrIp: 0.0.0.0/0
         - Description: allow icmp
           IpProtocol: icmp
           FromPort: '-1'
           ToPort: '-1'
-          CidrIp: 172.29.10.0/24
+          CidrIp: 172.0.0.0/20
       SecurityGroupEgress:
         - Description: allow outgoing HTTP
           IpProtocol: tcp
