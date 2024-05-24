@@ -255,12 +255,12 @@ Resources:
           IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: "172.29.10.0/24"
+          CidrIp: "172.0.0.0/20"
       -
           IpProtocol: udp
           FromPort: 53
           ToPort: 53
-          CidrIp: "172.29.10.0/24"
+          CidrIp: "172.0.0.0/20"
       VpcId: !Ref VPC
       Tags:
         -
