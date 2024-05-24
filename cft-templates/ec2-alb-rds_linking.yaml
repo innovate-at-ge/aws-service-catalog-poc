@@ -42,7 +42,7 @@ Parameters:
     Type: String
   Product1Version:
     Description: EC2 product version to be launched, like pa-YYYYYYY
-    Default: pa-hqmhd4o57d6pw
+    Default: pa-634xrt7x3xcsi
     Type: String
   ProductId2:
     Description: RDS product to be launched, like prod-WWWWWW
@@ -142,6 +142,7 @@ Resources:
           Value: !Ref CreatedBy
   ProductALB:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    DependsOn: ProductEC2
     Properties:
       ProductId: !Ref ProductId3
       ProvisionedProductName: !Sub "ALB-Product-chaining-${AWS::StackName}"
@@ -169,6 +170,7 @@ Resources:
           Value: !Ref CreatedBy
   ProductRDS:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    DependsOn: ProductEC2
     Properties:
       ProductId: !Ref ProductId2
       ProvisionedProductName: !Sub "RDS-Product-chaining-${AWS::StackName}"

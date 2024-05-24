@@ -57,7 +57,7 @@ Parameters:
   Product2Version:
     Description: EC2 product version to be launched, like pa-ZZZZZZZ
     Type: String
-    Default: pa-hqmhd4o57d6pw
+    Default: pa-634xrt7x3xcsi
   SubnetID:
     Type: List<AWS::EC2::Subnet::Id>
     Description: Subnet IDs
@@ -128,6 +128,7 @@ Resources:
           Value: !Ref CreatedBy
   ProductEC2:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    DependsOn: ProductALB
     Properties:
       ProductId: !Ref ProductId2
       #ProductName: "Simple Linux EC2"
