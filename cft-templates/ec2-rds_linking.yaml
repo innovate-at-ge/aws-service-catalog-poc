@@ -126,7 +126,6 @@ Resources:
 
   ProductRDS:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
-    DependsOn: ProductEC2
     Properties:
       ProductId: !Ref ProductId2
       ProvisionedProductName: !Sub "RDS-Product-chaining-${AWS::StackName}"

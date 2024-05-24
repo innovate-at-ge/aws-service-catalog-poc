@@ -128,7 +128,6 @@ Resources:
           Value: !Ref CreatedBy
   ProductEC2:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
-    DependsOn: ProductALB
     Properties:
       ProductId: !Ref ProductId2
       #ProductName: "Simple Linux EC2"
