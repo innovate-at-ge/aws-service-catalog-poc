@@ -174,7 +174,7 @@ Resources:
 
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT5M
+        Timeout: PT15M
 
   EC2Volume:
     Type: AWS::EC2::Volume
